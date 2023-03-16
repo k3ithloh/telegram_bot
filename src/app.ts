@@ -18,7 +18,11 @@ bot.command("quit", (ctx) => {
   ctx.leaveChat();
 });
 
-bot.launch();
+bot.launch({
+  webhook: {
+    domain: "https://oceanus-tele-bot.onrender.com",
+  },
+});
 
 // Enable graceful stop
 process.once("SIGINT", () => bot.stop("SIGINT"));
