@@ -1,0 +1,4 @@
+commands:
+  - yarn install
+  - yarn build
+  - yarn start
