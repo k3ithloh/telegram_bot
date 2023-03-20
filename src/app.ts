@@ -8,7 +8,8 @@ import bodyParser from "body-parser";
 type CustomContext = Context<Update> & {
   message: { text: string };
 };
-const BOT_TOKEN = process.env.BOT_TOKEN || "";
+const BOT_TOKEN = process.env.BOT_TOKEN;
+console.log("BOT_TOKEN:", BOT_TOKEN);
 const WEBHOOK_PATH = `/bot${BOT_TOKEN}`;
 const PORT = process.env.PORT || 3000;
 if (!BOT_TOKEN) {
