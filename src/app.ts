@@ -1,9 +1,9 @@
 import { Telegraf, Context } from "telegraf";
 import { Update } from "typegram";
-import dotenv from "dotenv";
+// import dotenv from "dotenv";
 import express from "express";
 import bodyParser from "body-parser";
-dotenv.config();
+// dotenv.config();
 
 type CustomContext = Context<Update> & {
   message: { text: string };
