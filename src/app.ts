@@ -1,30 +1,40 @@
-import { Context, Markup, Telegraf } from "telegraf";
+import { Telegraf, Context } from "telegraf";
 import { Update } from "typegram";
 import dotenv from "dotenv";
+import express from "express";
+import bodyParser from "body-parser";
 dotenv.config();
 
-const bot: Telegraf<Context<Update>> = new Telegraf(
-  process.env.BOT_TOKEN as string
-);
-bot.start((ctx) => {
-  ctx.reply("Hello " + ctx.from.first_name + "!");
-});
-bot.help((ctx) => {
-  ctx.reply("Send /start to receive a greeting");
-  ctx.reply("Send /quit to stop the bot");
-});
-bot.command("quit", (ctx) => {
-  ctx.telegram.leaveChat(ctx.message.chat.id);
-  ctx.leaveChat();
-});
+type CustomContext = Context<Update> & {
+  message: { text: string };
+};
+const BOT_TOKEN = process.env.BOT_TOKEN || "";
+const WEBHOOK_PATH = `/bot${BOT_TOKEN}`;
+const PORT = process.env.PORT || 3000;
+if (!BOT_TOKEN) {
+  throw new Error("BOT_TOKEN is required");
+}
 
-bot.launch({
-  webhook: {
-    domain: process.env.DOMAIN as string,
-    port: 443,
-  },
-});
+const bot = new Telegraf<CustomContext>(BOT_TOKEN);
+const app = express();
 
-// Enable graceful stop
-process.once("SIGINT", () => bot.stop("SIGINT"));
-process.once("SIGTERM", () => bot.stop("SIGTERM"));
+app.use(bodyParser.json());
+bot.start((ctx) => ctx.reply("Welcome!"));
+bot.help((ctx) => ctx.reply("Send me a message and I will echo it."));
+bot.on("message", (ctx) => {
+  if ("text" in ctx.message) {
+    ctx.reply(ctx.message.text);
+  } else {
+    ctx.reply("Sorry, I can only process text messages.");
+  }
+});
+// Set the webhook for the bot
+bot.telegram.setWebhook(`${process.env.APP_URL}${WEBHOOK_PATH}`);
+
+// Set the express app to listen to the webhook
+app.use(bot.webhookCallback(WEBHOOK_PATH));
+
+// Start the express server
+app.listen(PORT, () => {
+  console.log(`Bot is running on port ${PORT}`);
+});
