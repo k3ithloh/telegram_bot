@@ -20,7 +20,8 @@ bot.command("quit", (ctx) => {
 
 bot.launch({
   webhook: {
-    domain: "https://oceanus-tele-bot.onrender.com",
+    domain: process.env.DOMAIN as string,
+    port: 443,
   },
 });
 
